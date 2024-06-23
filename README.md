@@ -50,12 +50,12 @@ Task Manager — это приложение на Flutter для управле�
 
 ## Структура проекта
 
-![Структура](https://raw.githubusercontent.com/vilorg/task_manager/a7d1d149c2bab54c988c7ae92147857aa6420e18/structure.png)
+![Структура](https://raw.githubusercontent.com/vilorg/task_manager/c07557f39562d94d23fa8754256a9fff7c05e0c3/structure.png)
 
 ## Скриншоты
 
-![Главный экран](https://raw.githubusercontent.com/vilorg/task_manager/a7d1d149c2bab54c988c7ae92147857aa6420e18/main.png)
-![Экран добавления задачи](https://raw.githubusercontent.com/vilorg/task_manager/a7d1d149c2bab54c988c7ae92147857aa6420e18/add_task.png)
+![Главный экран](https://raw.githubusercontent.com/vilorg/task_manager/c07557f39562d94d23fa8754256a9fff7c05e0c3/main.png)
+![Экран добавления задачи](https://raw.githubusercontent.com/vilorg/task_manager/c07557f39562d94d23fa8754256a9fff7c05e0c3/add_task.png)
 
 ## Логирование
 
