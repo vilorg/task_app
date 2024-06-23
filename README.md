@@ -1,16 +1,70 @@
-# task_manager
+# Task Manager
 
-A new Flutter project.
+Task Manager — это приложение на Flutter для управления задачами с поддержкой добавления, редактирования и удаления задач. Приложение поддерживает локализацию, светлую и тёмную темы.
 
-## Getting Started
+## Установка
 
-This project is a starting point for a Flutter application.
+1. Убедитесь, что у вас установлены Flutter и Dart.
 
-A few resources to get you started if this is your first Flutter project:
+2. Клонируйте репозиторий:
+   ```bash
+   git clone https://github.com/vilorg/task_manager.git
+   ```
+3. Перейдите в папку проекта:
+   ```bash
+   cd task_manager
+   ```
+4. Установите зависимости:
+   ```bash
+   flutter pub get
+   ```
+5. Установите локали:
+   ```bash
+   flutter gen-l10n
+   ```
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Запуск приложения
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+1. Запустите эмулятор или подключите физическое устройство.
+2. Выполните команду:
+   ```bash
+   flutter run
+   ```
+
+## Функционал
+
+- Добавление новой задачи
+- Редактирование существующей задачи
+- Удаление задачи
+- Установка важности задачи (Нет, Низкая, Высокая)
+- Установка дедлайна задачи
+- Поддержка локализации (пока только русский)
+- Светлая и тёмная темы
+
+### На момент первой итерации сделано:
+
+- Составлена структура проекта
+- Сделаны стили
+- Добавлены базовые экраны
+- Логика сейчас в состоянии "заглушка"
+
+## Структура проекта
+
+![Структура](https://raw.githubusercontent.com/vilorg/task_manager/a7d1d149c2bab54c988c7ae92147857aa6420e18/structure.png)
+
+## Скриншоты
+
+![Главный экран](https://raw.githubusercontent.com/vilorg/task_manager/a7d1d149c2bab54c988c7ae92147857aa6420e18/main.png)
+![Экран добавления задачи](https://raw.githubusercontent.com/vilorg/task_manager/a7d1d149c2bab54c988c7ae92147857aa6420e18/add_task.png)
+
+## Логирование
+
+Для логирования используется пакет `logger`. Логи записываются для различных действий, таких как добавление, редактирование, удаление задач и установка дедлайна.
+
+## Ссылка на Apk
+
+- [Release Apk](https://drive.google.com/file/d/1wjXPV8shUUWd3qvbQbJYI3JVPkQ8kBgn/view?usp=sharing)
+
+## Авторы
+
+- [Dmitry Petrov](https://github.com/vilorg)
