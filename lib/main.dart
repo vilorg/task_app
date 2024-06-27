@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:task_manager/core/logger.dart';
+import 'package:task_manager/features/task/domain/todo_model.dart';
+import 'package:task_manager/features/task/presentation/pages/add_edit_task_page.dart';
 import 'core/theme.dart';
 import 'features/task/presentation/pages/home_page.dart';
 
@@ -44,7 +46,9 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => const HomePage(),
-        // '/add-edit': (context) => AddEditTaskPage(),
+        '/add-edit': (context) => AddEditTaskPage(
+              todo: ModalRoute.of(context)?.settings.arguments as TodoModel?,
+            ),
       },
     );
   }

@@ -3,7 +3,7 @@ import 'package:task_manager/core/constants/shadows.dart';
 import 'package:task_manager/core/logger.dart';
 import 'package:task_manager/features/task/domain/todo_model.dart';
 import 'package:task_manager/features/task/presentation/pages/add_edit_task_page.dart';
-import 'package:task_manager/features/task/presentation/widgets/custom_sliver_header.dart';
+import 'package:task_manager/features/task/presentation/widgets/todo_custom_sliver_header.dart';
 import 'package:task_manager/features/task/presentation/widgets/task_item.dart';
 
 class HomePage extends StatefulWidget {
@@ -140,7 +140,7 @@ class _HomePageState extends State<HomePage> {
       body: CustomScrollView(
         slivers: [
           SliverPersistentHeader(
-            delegate: CustomSliverHeader(
+            delegate: TodoCustomSliverHeader(
               topPadding: MediaQuery.of(context).padding.top,
               doneCount: todos.where((e) => e.isDone).length,
               isHidden: isHidden,
@@ -148,17 +148,17 @@ class _HomePageState extends State<HomePage> {
             ),
             pinned: true,
           ),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(15.0),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.tertiary,
-                  boxShadow: AppShadows.tileShadow,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Column(
-                  children: [
+          SliverPadding(
+            padding: const EdgeInsets.all(15.0),
+            sliver: DecoratedSliver(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.tertiary,
+                boxShadow: AppShadows.tileShadow,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              sliver: SliverList(
+                delegate: SliverChildListDelegate(
+                  [
                     for (var todo in currentTasks)
                       InkWell(
                         onTap: () => _addOrEditTask(todo: todo),
@@ -174,11 +174,10 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
-          SliverToBoxAdapter(
-            child: SizedBox(
-              height: MediaQuery.of(context).padding.bottom,
-            ),
-          ),
+          SliverPadding(
+              padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).padding.bottom,
+          )),
         ],
       ),
       floatingActionButton: FloatingActionButton(

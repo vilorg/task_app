@@ -4,13 +4,13 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'package:task_manager/core/constants/shadows.dart';
 
-class CustomSliverHeader extends SliverPersistentHeaderDelegate {
+class TodoCustomSliverHeader extends SliverPersistentHeaderDelegate {
   final double topPadding;
   final int doneCount;
   final bool isHidden;
   final VoidCallback onTap;
 
-  const CustomSliverHeader({
+  const TodoCustomSliverHeader({
     required this.topPadding,
     required this.doneCount,
     required this.isHidden,

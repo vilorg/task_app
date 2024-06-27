@@ -1,8 +1,9 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 import 'package:task_manager/core/logger.dart';
 import 'package:task_manager/features/task/domain/todo_model.dart';
 
@@ -23,21 +24,9 @@ class _AddEditTaskPageState extends State<AddEditTaskPage> {
   bool isNeedDeadline = false;
 
   Widget getImportanceWidget(Importance importance) {
-    String importanceText = "";
-    Color? importanceColor = Theme.of(context).textTheme.bodyMedium?.color;
+    String importanceText = importance.getText(context);
+    Color? importanceColor = importance.color(context);
 
-    switch (importance) {
-      case Importance.high:
-        importanceText = AppLocalizations.of(context)!.imporanceHight;
-        importanceColor = Theme.of(context).colorScheme.error;
-        break;
-      case Importance.low:
-        importanceText = AppLocalizations.of(context)!.imporanceLow;
-        break;
-      case Importance.none:
-        importanceText = AppLocalizations.of(context)!.importanceNone;
-        break;
-    }
     return Row(
       children: [
         importance == Importance.high
@@ -101,9 +90,6 @@ class _AddEditTaskPageState extends State<AddEditTaskPage> {
 
   @override
   Widget build(BuildContext context) {
-    final locale = Localizations.localeOf(context).toString();
-    final dateFormat = DateFormat.yMMMMd(locale);
-
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -170,41 +156,13 @@ class _AddEditTaskPageState extends State<AddEditTaskPage> {
             const SizedBox(height: 15),
             const Divider(),
             const SizedBox(height: 15),
-            Row(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      AppLocalizations.of(context)!.deadline,
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                    isNeedDeadline
-                        ? InkWell(
-                            onTap: () => _selectDate(context),
-                            child: Text(
-                              dateFormat.format(_deadline ?? DateTime.now()),
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodySmall!
-                                  .copyWith(
-                                    color: Theme.of(context).primaryColor,
-                                  ),
-                            ),
-                          )
-                        : const SizedBox(),
-                  ],
-                ),
-                Switch(
-                  value: isNeedDeadline,
-                  onChanged: (v) => setState(() => isNeedDeadline = v),
-                  activeColor: Theme.of(context).primaryColor,
-                  inactiveThumbColor: Theme.of(context).scaffoldBackgroundColor,
-                  inactiveTrackColor: Theme.of(context).colorScheme.secondary,
-                )
-              ],
+            _DeadlineWidget(
+              isNeedDeadline: isNeedDeadline,
+              selectDate: _selectDate,
+              setIsNeedDeadline: (p0) => setState(
+                () => isNeedDeadline = p0,
+              ),
+              deadline: _deadline,
             ),
             const SizedBox(height: 15),
             const Divider(),
@@ -235,6 +193,60 @@ class _AddEditTaskPageState extends State<AddEditTaskPage> {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _DeadlineWidget extends StatelessWidget {
+  final bool isNeedDeadline;
+  final Function(BuildContext) selectDate;
+  final DateTime? deadline;
+  final Function(bool) setIsNeedDeadline;
+
+  const _DeadlineWidget({
+    required this.isNeedDeadline,
+    required this.selectDate,
+    this.deadline,
+    required this.setIsNeedDeadline,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final locale = Localizations.localeOf(context).toString();
+    final dateFormat = DateFormat.yMMMMd(locale);
+
+    return Row(
+      mainAxisSize: MainAxisSize.max,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              AppLocalizations.of(context)!.deadline,
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+            isNeedDeadline
+                ? InkWell(
+                    onTap: () => selectDate(context),
+                    child: Text(
+                      dateFormat.format(deadline ?? DateTime.now()),
+                      style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                            color: Theme.of(context).primaryColor,
+                          ),
+                    ),
+                  )
+                : const SizedBox(),
+          ],
+        ),
+        Switch(
+          value: isNeedDeadline,
+          onChanged: setIsNeedDeadline,
+          activeColor: Theme.of(context).primaryColor,
+          inactiveThumbColor: Theme.of(context).scaffoldBackgroundColor,
+          inactiveTrackColor: Theme.of(context).colorScheme.secondary,
+        )
+      ],
     );
   }
 }

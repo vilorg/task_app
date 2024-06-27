@@ -3,31 +3,31 @@ import 'package:flutter/material.dart';
 class AppShadows {
   static const List<BoxShadow> appBarShadow = [
     BoxShadow(
-      color: Colors.black12,
+      color: Color.fromRGBO(0, 0, 0, .1),
       blurRadius: 4,
       offset: Offset(0, 2),
     ),
     BoxShadow(
-      color: Colors.black12,
+      color: Color.fromRGBO(0, 0, 0, .1),
       blurRadius: 5,
       offset: Offset(0, 4),
     ),
     BoxShadow(
-      color: Colors.black26,
+      color: Color.fromRGBO(0, 0, 0, .2),
       blurRadius: 10,
       offset: Offset(0, 1),
     ),
   ];
 
   static List<BoxShadow> tileShadow = [
-    BoxShadow(
-      color: Colors.black.withOpacity(.06),
+    const BoxShadow(
+      color: Color.fromRGBO(0, 0, 0, .06),
       blurRadius: 2,
     ),
-    BoxShadow(
-      color: Colors.black.withOpacity(.12),
+    const BoxShadow(
+      color: Color.fromRGBO(0, 0, 0, .12),
       blurRadius: 2,
-      offset: const Offset(0, 2),
+      offset: Offset(0, 2),
     ),
   ];
 }
