@@ -1,0 +1,19 @@
+{
+  "myBusiness": "Мои дела",
+  "done": "Выполнено - {count}",
+  "@done": {
+    "placeholders": {
+    "count": {
+        "type": "num",
+        "format": "compact"
+        }
+    }
+  },
+  "save": "Сохранить",
+  "importance": "Важность",
+  "importanceNone": "Нет",
+  "imporanceLow": "Низкий",
+  "imporanceHight": "Высокий",
+  "deadline": "Сделать до",
+  "remove": "Удалить"
+}
