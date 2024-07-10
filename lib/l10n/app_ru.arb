@@ -15,5 +15,6 @@
   "imporanceLow": "Низкий",
   "imporanceHight": "Высокий",
   "deadline": "Сделать до",
-  "remove": "Удалить"
+  "remove": "Удалить",
+  "noNetwork": "Нет сети, простите"
 }

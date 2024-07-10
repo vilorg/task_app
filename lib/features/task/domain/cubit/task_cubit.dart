@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:task_manager/core/logger.dart';
@@ -13,52 +12,47 @@ part 'task_state.dart';
 class TaskCubit extends Cubit<TaskState> {
   final ApiClient apiClient;
   final TaskRepository taskRepository;
-  final String deviceId;
   final NetworkInfo networkInfo;
+  final String deviceId;
   StreamSubscription<bool>? _connectivitySubscription;
+  bool isConnected = true;
 
+  // Конструктор, в котором мы подписываемся на изменения сетевого состояния
   TaskCubit(
       this.apiClient, this.taskRepository, this.networkInfo, this.deviceId)
       : super(TaskInitial()) {
+    preloadInit();
+  }
+
+  void preloadInit() {
     _connectivitySubscription =
         networkInfo.onConnectivityChanged.listen((isConnected) {
       if (isConnected) {
+        isConnected = true;
         syncOfflineChanges();
+      } else {
+        isConnected = false;
+        if (state is TaskLoaded) {
+          emit(TaskLoaded((state as TaskLoaded).tasks, isConnected));
+        }
       }
     });
   }
 
+  // Отменяем подписку при закрытии кубита
   @override
   Future<void> close() {
     _connectivitySubscription?.cancel();
     return super.close();
   }
 
-  Future<bool> syncOfflineChanges() async {
+  // Синхронизация оффлайн-изменений при восстановлении соединения
+  Future<void> syncOfflineChanges() async {
     logger.i('Syncing offline changes');
-    final offlineChanges = taskRepository.getOfflineChanges();
-    for (var change in offlineChanges) {
-      try {
-        if (change['type'] == 'add') {
-          final task = TodoModel.fromJson(change['data']);
-          await apiClient.addTodoItem(task);
-        } else if (change['type'] == 'update') {
-          final task = TodoModel.fromJson(change['data']);
-          await apiClient.updateTodoItem(task);
-        } else if (change['type'] == 'delete') {
-          final id = change['data'] as String;
-          await apiClient.deleteTodoItem(id);
-        }
-      } catch (e) {
-        logger.e('Failed to sync change', error: e);
-        return false;
-      }
-    }
-    await taskRepository.clearOfflineChanges();
-    final revision = await taskRepository.getRevision();
-    return await _checkAndUpdateData(revision);
+    await _syncWithServer(await taskRepository.getRevision());
   }
 
+  // Загрузка задач из локального хранилища и синхронизация с сервером при необходимости
   Future<void> fetchTasks() async {
     try {
       emit(TaskLoading());
@@ -68,110 +62,117 @@ class TaskCubit extends Cubit<TaskState> {
       apiClient.revision = revision;
       logger.i(
           'Fetched ${tasks.length} tasks from local storage with revision $revision');
-
-      if (await networkInfo.isConnected()) {
-        if (await syncOfflineChanges()) {
-          return;
-        }
+      bool result = true;
+      if (isConnected) {
+        result = await _syncWithServer(revision);
       }
-      emit(TaskLoaded(tasks));
+      if (result) {
+        emit(TaskLoaded(tasks, isConnected));
+      }
     } catch (e) {
       logger.e('Failed to fetch tasks', error: e);
       emit(const TaskError('Failed to fetch tasks'));
     }
   }
 
+  // Добавление новой задачи
   Future<void> addTask(TodoModel task) async {
     final newTask = task.copyWith(lastUpdatedBy: deviceId);
     await taskRepository.addTask(newTask);
+    await _incrementLocalRevision();
     final currentState = state;
     if (currentState is TaskLoaded) {
       final updatedTasks = List<TodoModel>.from(currentState.tasks)
         ..add(newTask);
-      emit(TaskLoaded(updatedTasks));
+      emit(TaskLoaded(updatedTasks, isConnected));
     }
 
-    if (await networkInfo.isConnected()) {
+    if (isConnected) {
       try {
-        await apiClient.addTodoItem(newTask);
-        await taskRepository.updateRevision(apiClient.revision);
+        await _syncWithServer(await taskRepository.getRevision());
       } catch (e) {
-        logger.e('Failed to add task online', error: e);
+        logger.e('Failed to sync with server', error: e);
       }
     } else {
-      await taskRepository.addOfflineChange('add', newTask.toJson());
       logger.i('No internet connection. Task added offline');
     }
   }
 
+  // Обновление существующей задачи
   Future<void> updateTask(TodoModel task) async {
     final updatedTask = task.copyWith(lastUpdatedBy: deviceId);
     await taskRepository.updateTask(updatedTask);
+    await _incrementLocalRevision();
     final currentState = state;
     if (currentState is TaskLoaded) {
       final updatedTasks = currentState.tasks
           .map((t) => t.id == updatedTask.id ? updatedTask : t)
           .toList();
-      emit(TaskLoaded(updatedTasks));
+      emit(TaskLoaded(updatedTasks, isConnected));
     }
 
-    if (await networkInfo.isConnected()) {
+    if (isConnected) {
       try {
-        await apiClient.updateTodoItem(updatedTask);
-        await taskRepository.updateRevision(apiClient.revision);
+        await _syncWithServer(await taskRepository.getRevision());
       } catch (e) {
-        logger.e('Failed to update task online', error: e);
+        logger.e('Failed to sync with server', error: e);
       }
     } else {
-      await taskRepository.addOfflineChange('update', updatedTask.toJson());
       logger.i('No internet connection. Task updated offline');
     }
   }
 
+  // Удаление задачи
   Future<void> deleteTask(String id) async {
     await taskRepository.deleteTask(id);
+    await _incrementLocalRevision();
     final currentState = state;
     if (currentState is TaskLoaded) {
       final updatedTasks =
           currentState.tasks.where((task) => task.id != id).toList();
-      emit(TaskLoaded(updatedTasks));
+      emit(TaskLoaded(updatedTasks, isConnected));
     }
 
-    if (await networkInfo.isConnected()) {
+    if (isConnected) {
       try {
-        await apiClient.deleteTodoItem(id);
-        await taskRepository.updateRevision(apiClient.revision);
+        await _syncWithServer(await taskRepository.getRevision());
       } catch (e) {
-        logger.e('Failed to delete task online', error: e);
+        logger.e('Failed to sync with server', error: e);
       }
     } else {
-      await taskRepository.addOfflineChange('delete', id);
       logger.i('No internet connection. Task deleted offline');
     }
   }
 
-  Future<bool> _checkAndUpdateData(int localRevision) async {
-    try {
-      logger.i('Checking for updates from server');
-      final serverTasks = await apiClient.getTodoList();
-      final serverRevision = await apiClient.getApiRevision();
-      logger.i(
-          'Server revision: $serverRevision, Local revision: $localRevision');
+  // Увеличиваем локальную ревизию после каждого изменения данных
+  Future<void> _incrementLocalRevision() async {
+    final currentRevision = await taskRepository.getRevision();
+    await taskRepository.updateRevision(currentRevision + 1);
+  }
 
-      if (serverRevision != localRevision) {
-        logger.i('Revisions do not match. Updating local data');
-        await taskRepository.updateRevision(serverRevision);
+  // Синхронизация данных с сервером
+  Future<bool> _syncWithServer(int localRevision) async {
+    try {
+      final serverTasks = await apiClient.getTodoList();
+      final serverRevision = apiClient.revision;
+
+      if (serverRevision > localRevision) {
+        // Если ревизия на сервере больше, обновляем локальные данные
+        logger.i('Server revision is greater. Updating local data.');
         await taskRepository.replaceLocalData(serverTasks);
-        emit(TaskLoaded(serverTasks));
-        return true;
-      } else {
-        logger.i('Revisions match. No update needed');
+        await taskRepository.updateRevision(serverRevision);
+        emit(TaskLoaded(serverTasks, true));
         return false;
+      } else if (localRevision > serverRevision) {
+        // Если локальная ревизия больше, обновляем данные на сервере
+        logger.i('Local revision is greater. Updating server data.');
+        final localTasks = await taskRepository.getTasks();
+        await apiClient.patchTodoList(localTasks, localRevision);
+        await taskRepository.updateRevision(apiClient.revision);
       }
     } catch (e) {
-      logger.e('Failed to check and update data', error: e);
-      emit(const TaskError('Failed to check and update data'));
-      return false;
+      logger.e('Failed to sync with server', error: e);
     }
+    return true;
   }
 }

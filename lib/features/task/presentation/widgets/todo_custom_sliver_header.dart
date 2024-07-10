@@ -9,12 +9,14 @@ class TodoCustomSliverHeader extends SliverPersistentHeaderDelegate {
   final int doneCount;
   final bool isHidden;
   final VoidCallback onTap;
+  final AppLocalizations localizations;
 
-  const TodoCustomSliverHeader({
+  const TodoCustomSliverHeader({  
     required this.topPadding,
     required this.doneCount,
     required this.isHidden,
     required this.onTap,
+    required this.localizations,
   });
 
   @override
@@ -58,7 +60,7 @@ class TodoCustomSliverHeader extends SliverPersistentHeaderDelegate {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        AppLocalizations.of(context)!.myBusiness,
+                        localizations.myBusiness,
                         style: TextStyle.lerp(
                           Theme.of(context).textTheme.titleLarge,
                           Theme.of(context).textTheme.titleMedium,
@@ -67,7 +69,7 @@ class TodoCustomSliverHeader extends SliverPersistentHeaderDelegate {
                       ),
                       progress <= .37
                           ? Text(
-                              AppLocalizations.of(context)!.done(doneCount),
+                              localizations.done(doneCount),
                               style: TextStyle.lerp(
                                 Theme.of(context)
                                     .textTheme
