@@ -65,5 +65,4 @@ class DefaultFirebaseOptions {
     storageBucket: 'task-manager-yandex.appspot.com',
     iosBundleId: 'com.vilorg.taskManager',
   );
-
 }
