@@ -67,6 +67,10 @@ android {
             resValue "string", "app_name", "Task Manager"
         }
     }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
 }
 
 flutter {
