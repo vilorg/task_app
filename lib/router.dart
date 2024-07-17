@@ -1,9 +1,13 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:go_router/go_router.dart';
 import 'package:task_manager/features/task/domain/todo_model.dart';
 import 'package:task_manager/features/task/presentation/pages/add_edit_task_page.dart';
 import 'package:task_manager/features/task/presentation/pages/home_page.dart';
 
 final GoRouter router = GoRouter(
+  observers: [
+    FirebaseAnalyticsObserver(analytics: FirebaseAnalytics.instance),
+  ],
   initialLocation: '/',
   routes: [
     GoRoute(

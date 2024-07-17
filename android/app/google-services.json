@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "887132438702",
+    "project_id": "task-manager-yandex",
+    "storage_bucket": "task-manager-yandex.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:887132438702:android:56f6956defe2b9bca32d3f",
+        "android_client_info": {
+          "package_name": "com.vilorg.taskManager"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDx6It5lhiI0p7pQEEasQkNjkW2h5Pik70"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:887132438702:android:f262197b6f341d8ba32d3f",
+        "android_client_info": {
+          "package_name": "com.vilorg.task_manager"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDx6It5lhiI0p7pQEEasQkNjkW2h5Pik70"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

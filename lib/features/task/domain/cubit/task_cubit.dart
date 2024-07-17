@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:task_manager/core/logger.dart';
 import 'package:task_manager/core/network_info.dart';
 import 'package:task_manager/features/task/data/task_repository.dart';
@@ -69,8 +70,9 @@ class TaskCubit extends Cubit<TaskState> {
       if (result) {
         emit(TaskLoaded(tasks, isConnected));
       }
-    } catch (e) {
-      logger.e('Failed to fetch tasks', error: e);
+    } catch (e, s) {
+      logger.e('Failed to fetch tasks', error: e, stackTrace: s);
+      FirebaseCrashlytics.instance.recordError(e, s);
       emit(const TaskError('Failed to fetch tasks'));
     }
   }
@@ -90,8 +92,9 @@ class TaskCubit extends Cubit<TaskState> {
     if (isConnected) {
       try {
         await _syncWithServer(await taskRepository.getRevision());
-      } catch (e) {
-        logger.e('Failed to sync with server', error: e);
+      } catch (e, s) {
+        logger.e('Failed to sync with server', error: e, stackTrace: s);
+        FirebaseCrashlytics.instance.recordError(e, s);
       }
     } else {
       logger.i('No internet connection. Task added offline');
@@ -114,8 +117,9 @@ class TaskCubit extends Cubit<TaskState> {
     if (isConnected) {
       try {
         await _syncWithServer(await taskRepository.getRevision());
-      } catch (e) {
-        logger.e('Failed to sync with server', error: e);
+      } catch (e, s) {
+        logger.e('Failed to sync with server', error: e, stackTrace: s);
+        FirebaseCrashlytics.instance.recordError(e, s);
       }
     } else {
       logger.i('No internet connection. Task updated offline');
@@ -136,8 +140,9 @@ class TaskCubit extends Cubit<TaskState> {
     if (isConnected) {
       try {
         await _syncWithServer(await taskRepository.getRevision());
-      } catch (e) {
-        logger.e('Failed to sync with server', error: e);
+      } catch (e, s) {
+        logger.e('Failed to sync with server', error: e, stackTrace: s);
+        FirebaseCrashlytics.instance.recordError(e, s);
       }
     } else {
       logger.i('No internet connection. Task deleted offline');
@@ -170,8 +175,9 @@ class TaskCubit extends Cubit<TaskState> {
         await apiClient.patchTodoList(localTasks, localRevision);
         await taskRepository.updateRevision(apiClient.revision);
       }
-    } catch (e) {
-      logger.e('Failed to sync with server', error: e);
+    } catch (e, s) {
+      logger.e('Failed to sync with server', error: e, stackTrace: s);
+      FirebaseCrashlytics.instance.recordError(e, s);
     }
     return true;
   }

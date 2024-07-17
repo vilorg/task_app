@@ -11,7 +11,7 @@ class TodoCustomSliverHeader extends SliverPersistentHeaderDelegate {
   final VoidCallback onTap;
   final AppLocalizations localizations;
 
-  const TodoCustomSliverHeader({  
+  const TodoCustomSliverHeader({
     required this.topPadding,
     required this.doneCount,
     required this.isHidden,
