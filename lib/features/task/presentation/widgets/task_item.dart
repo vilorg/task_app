@@ -1,10 +1,10 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import 'package:task_manager/features/task/domain/todo_model.dart';
-import 'package:task_manager/features/task/presentation/pages/add_edit_task_page.dart';
 
 class TaskItem extends StatelessWidget {
   final TodoModel todo;
@@ -60,10 +60,7 @@ class TaskItem extends StatelessWidget {
         ),
       ),
       child: InkWell(
-        onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => AddEditTaskPage(todo: todo)),
-        ),
+        onTap: () => context.go('/add_task', extra: todo),
         child: Container(
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.tertiary,
@@ -87,6 +84,7 @@ class TaskItem extends StatelessWidget {
                   : false,
             ),
             title: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 todo.done
                     ? const SizedBox()

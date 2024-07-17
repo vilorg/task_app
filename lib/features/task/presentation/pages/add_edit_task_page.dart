@@ -4,8 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
-import 'package:task_manager/core/constants/importance_extension.dart';
 
+import 'package:task_manager/core/constants/importance_extension.dart';
 import 'package:task_manager/core/logger.dart';
 import 'package:task_manager/features/task/domain/cubit/task_cubit.dart';
 import 'package:task_manager/features/task/domain/todo_model.dart';
@@ -27,7 +27,7 @@ class _AddEditTaskPageState extends State<AddEditTaskPage> {
   bool isNeedDeadline = false;
 
   Widget getImportanceWidget(Importance importance) {
-    String importanceText = importance.getText(context);
+    String importanceText = importance.getText(AppLocalizations.of(context)!);
     Color? importanceColor = importance.color(context);
 
     return Row(
@@ -122,6 +122,7 @@ class _AddEditTaskPageState extends State<AddEditTaskPage> {
 
   @override
   Widget build(BuildContext context) {
+    AppLocalizations localization = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -136,6 +137,7 @@ class _AddEditTaskPageState extends State<AddEditTaskPage> {
             onPressed: (isNeedDeadline && _deadline == null) || _title.isEmpty
                 ? null
                 : () async {
+                    if (context.read<TaskCubit>().state is! TaskLoaded) return;
                     bool result = await _saveTask();
                     if (result) {
                       if (context.mounted) {
@@ -144,13 +146,15 @@ class _AddEditTaskPageState extends State<AddEditTaskPage> {
                     } else {
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text('Failed to save task')));
+                          const SnackBar(
+                            content: Text('Failed to save task'),
+                          ),
+                        );
                       }
                     }
                   },
             child: Text(
-              AppLocalizations.of(context)!.save,
+              localization.save,
               style: Theme.of(context).textTheme.bodySmall!.copyWith(
                     color: Theme.of(context).primaryColor,
                   ),
@@ -176,7 +180,7 @@ class _AddEditTaskPageState extends State<AddEditTaskPage> {
             const Divider(),
             const SizedBox(height: 15),
             Text(
-              AppLocalizations.of(context)!.importance,
+              localization.importance,
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             DropdownButtonFormField<Importance>(
@@ -202,6 +206,7 @@ class _AddEditTaskPageState extends State<AddEditTaskPage> {
             const Divider(),
             const SizedBox(height: 15),
             _DeadlineWidget(
+              localizations: localization,
               isNeedDeadline: isNeedDeadline,
               selectDate: _selectDate,
               setIsNeedDeadline: (p0) => setState(
@@ -234,7 +239,7 @@ class _AddEditTaskPageState extends State<AddEditTaskPage> {
                   ),
                   const SizedBox(width: 5),
                   Text(
-                    AppLocalizations.of(context)!.remove,
+                    localization.remove,
                     style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                           color: widget.todo == null
                               ? Theme.of(context).colorScheme.secondary
@@ -256,12 +261,14 @@ class _DeadlineWidget extends StatelessWidget {
   final Function(BuildContext) selectDate;
   final DateTime? deadline;
   final Function(bool) setIsNeedDeadline;
+  final AppLocalizations localizations;
 
   const _DeadlineWidget({
     required this.isNeedDeadline,
     required this.selectDate,
     this.deadline,
     required this.setIsNeedDeadline,
+    required this.localizations,
   });
 
   @override
@@ -277,7 +284,7 @@ class _DeadlineWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              AppLocalizations.of(context)!.deadline,
+              localizations.deadline,
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             isNeedDeadline
