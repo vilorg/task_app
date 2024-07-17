@@ -51,7 +51,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyDx6It5lhiI0p7pQEEasQkNjkW2h5Pik70',
-    appId: '1:887132438702:android:56f6956defe2b9bca32d3f',
+    appId: '1:887132438702:android:f262197b6f341d8ba32d3f',
     messagingSenderId: '887132438702',
     projectId: 'task-manager-yandex',
     storageBucket: 'task-manager-yandex.appspot.com',
@@ -65,4 +65,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'task-manager-yandex.appspot.com',
     iosBundleId: 'com.vilorg.taskManager',
   );
+
 }
