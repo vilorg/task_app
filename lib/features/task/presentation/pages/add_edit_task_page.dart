@@ -1,4 +1,5 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -97,7 +98,9 @@ class _AddEditTaskPageState extends State<AddEditTaskPage> {
       logger.i(
           'Task "${newTodo.text}" saved with importance "${newTodo.importance}" and deadline "${newTodo.deadline}"');
       return true;
-    } catch (e) {
+    } catch (e, s) {
+      FirebaseCrashlytics.instance.recordError(e, s);
+
       if (context.mounted) {
         return false;
       }

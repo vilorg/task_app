@@ -1,0 +1,79 @@
+name: Flutter CI/CD
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.22.2"
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Create .env file
+        run: echo "API_TOKEN=${{ secrets.API_TOKEN }}" > .env
+
+      - name: Generate code
+        run: flutter pub run build_runner build --delete-conflicting-outputs
+
+      - name: Format code
+        run: flutter format --set-exit-if-changed .
+
+      - name: Analyze code
+        run: flutter analyze
+
+      - name: Run tests
+        run: flutter test --coverage
+
+      - name: Upload test coverage
+        uses: actions/upload-artifact@v2
+        with:
+          name: coverage
+          path: coverage/lcov.info
+
+      - name: Build APK (dev flavor)
+        run: flutter build apk --flavor dev
+
+      - name: Build APK (prod flavor)
+        run: flutter build apk --flavor prod
+
+      - name: Upload dev APK
+        uses: actions/upload-artifact@v2
+        with:
+          name: dev-apk
+          path: build/app/outputs/flutter-apk/app-dev-release.apk
+
+      - name: Upload prod APK
+        uses: actions/upload-artifact@v2
+        with:
+          name: prod-apk
+          path: build/app/outputs/flutter-apk/app-prod-release.apk
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Download APK artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: prod-apk
+          path: build/app/outputs/flutter-apk
+
+      - name: Upload to Firebase App Distribution
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          run: |
+            curl -sL https://firebase.tools | bash
+            firebase appdistribution:distribute build/app/outputs/flutter-apk/app-prod-release.apk --app 1:887132438702:android:56f6956defe2b9bca32d3f --token $FIREBASE_TOKEN
