@@ -59,8 +59,7 @@ android {
     productFlavors {
         dev {
             dimension "default"
-            applicationIdSuffix ".dev"
-            versionNameSuffix "-dev"
+            versionNameSuffix "-debug"
             resValue "string", "app_name", "Task Manager DEV"
         }
         prod {
